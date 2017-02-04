@@ -1,0 +1,12 @@
+machine:
+    python:
+        version: virtualenv global 3.5
+
+dependencies:
+    pre:
+        - pip install -r requirements.txt
+        - pip install ansible
+
+test:
+    pre:
+        - ./manage.py test
