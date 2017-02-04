@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 
-from .models import Task
+from .models import Task, UserProfile
 
 
 class UserRegistrationSerializer(serializers.Serializer):
@@ -46,3 +46,20 @@ class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
         exclude = []
+
+
+class DetailTaskSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Task
+        exclude = []
+        depth = 1
+
+
+class AddFriendSerializer(serializers.Serializer):
+    name = serializers.CharField()
+
+    def validate_new_friend(self, name):
+        friend = UserProfile.objects.friends.filter(name=name).first()
+        if friend:
+            raise serializers.ValidationError("You already have this person as a friend.")
+        return name

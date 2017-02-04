@@ -6,8 +6,9 @@ from rest_framework.decorators import list_route
 from django.db.models import Q
 from django.contrib.auth.models import User
 
-from .serializers import TaskSerializer, UserSerializer, UserRegistrationSerializer, UserLoginSerializer
-from .models import Task
+from .serializers import TaskSerializer, UserSerializer, \
+     UserRegistrationSerializer, UserLoginSerializer, DetailTaskSerializer, AddFriendSerializer
+from .models import Task, UserProfile, Friend
 
 
 class UserSignup(viewsets.ModelViewSet):
@@ -22,6 +23,7 @@ class UserSignup(viewsets.ModelViewSet):
         user_serializer.is_valid(raise_exception=True)
         user = user_serializer.save()
         Token.objects.create(user=user)
+        UserProfile.objects.create(user=user)
         return Response(user_serializer.data)
 
 
@@ -38,6 +40,12 @@ class UserLogin(viewsets.ModelViewSet):
         return Response({'user_id': user.pk, 'username': user.username, 'token': token.key})
 
 
+class UserListAPIView(generics.ListAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = UserSerializer
+    queryset = User.objects.all()
+
+
 class RetrieveUpdateUserAPIView(generics.RetrieveUpdateAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = UserSerializer
@@ -46,7 +54,8 @@ class RetrieveUpdateUserAPIView(generics.RetrieveUpdateAPIView):
         return User.objects.filter(pk=self.kwargs['pk'])
 
 
-class ListCreateTasksAPIView(generics.ListCreateAPIView):
+class ListCreateUserTasksAPIView(generics.ListCreateAPIView):
+    """Filter tasks based on user"""
     permission_classes = (IsAuthenticated,)
     serializer_class = TaskSerializer
 
@@ -58,12 +67,26 @@ class ListCreateTasksAPIView(generics.ListCreateAPIView):
         return Task.objects.filter(user=self.kwargs['pk'])
 
 
-class RetrieveUpdateDestroyTaskAPIView(generics.RetrieveUpdateDestroyAPIView):
+class ListCreateAllTasksAPIView(generics.ListAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = TaskSerializer
+    queryset = Task.objects.all()
+
+
+class RetrieveUpdateDestroyUserTaskAPIView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = TaskSerializer
 
     def get_queryset(self):
         return Task.objects.filter(Q(user=self.kwargs['user']) & Q(pk=self.kwargs['pk']))
+
+
+class RetrieveUpdateDestroyAllTasksAPIView(generics.RetrieveUpdateAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = DetailTaskSerializer
+
+    def get_queryset(self):
+        return Task.objects.filter(pk=self.kwargs['pk'])
 
 
 class TaskSearch(viewsets.ModelViewSet):
@@ -109,3 +132,14 @@ class TaskSearchBoth(generics.ListAPIView):
             queryset = queryset.filter(Q(name__contains=name) & Q(due_date__contains=date) & Q(user=self.request.user.pk))
         return queryset
 
+
+class AddFriend(viewsets.ModelViewSet):
+    permission_classes = (AllowAny,)
+    serializer_class = AddFriendSerializer
+
+    @list_route(methods=['post'])
+    def add_friend(self, request, pk, friend_pk):
+        user = User.objects.get(pk=pk)
+        friend = Friend.objects.create(name=friend_pk)
+        new_friend = user.friends.add(friend)
+        return new_friend

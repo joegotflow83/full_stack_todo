@@ -19,7 +19,7 @@
             </div>
             <div v-if="errors" class="errors">{{ errors }}</div>
             <br />
-            <button type="submit" class="btn btn-success">Login</button>
+            <button type="submit" class="btn btn-success">Sign Up</button>
           <form>
       </div>
     </div>

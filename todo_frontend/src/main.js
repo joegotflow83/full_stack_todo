@@ -9,6 +9,9 @@ import Hello from './components/Hello.vue'
 import Task from './components/Task.vue'
 import PostTask from './components/PostTask.vue'
 import Search from './components/Search.vue'
+import AllTasks from './components/AllTasks.vue'
+import DetailTask from './components/DetailTask.vue'
+import Users from './components/Users.vue'
 import App from './App.vue'
 
 Vue.use(VueRouter)
@@ -20,6 +23,9 @@ const routes = [
   { path: '/tasks', component: Task, name: 'tasks', meta: { requiresAuth: true }},
   { path: '/create/task', component: PostTask, name: 'createTask', meta: { requiresAuth: true }},
   { path: '/search/tasks', component: Search, name: 'searchTasks', meta: { requiresAuth: true }},
+  { path: '/tasks/all', component: AllTasks, name: 'allTasks', meta: { requiresAuth: true }},
+  { path: '/tasks/:id', component: DetailTask, name: 'detailTask', meta: { requiresAuth: true }},
+  { path: '/users/all', component: Users, name: 'users', meta: { requiresAuth: true }}
 ]
 
 const router = new VueRouter({
