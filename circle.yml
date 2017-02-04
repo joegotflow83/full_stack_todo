@@ -1,7 +1,4 @@
 machine:
-    pre:
-        - rm .python-version
-
     python:
         version: 3.5.1
 
