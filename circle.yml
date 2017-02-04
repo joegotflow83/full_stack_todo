@@ -1,6 +1,6 @@
 machine:
     python:
-        version: virtualenv global 3.5
+        version: virtualenv global 3.5.1
 
 dependencies:
     pre:
