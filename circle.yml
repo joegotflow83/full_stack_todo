@@ -9,4 +9,4 @@ dependencies:
 
 test:
     pre:
-        - ./manage.py test
+        - todo_backend/manage.py test api
